@@ -99,6 +99,7 @@ public class MediaService : IMediaService
 			{
 				Id = m.Id,
 				Title = m.Title,
+				ImageUrl = m.ImageUrl,
 				MediaType = m.MediaType == MediaType.Movie ? "Movie" : "TV Show",
 				ReleaseDate = m.ReleaseDate,
 				AverageRating = m.Reviews!.Count > 0 ? m.Reviews.Average(r => r.Rating) : 0,

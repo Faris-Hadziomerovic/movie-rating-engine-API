@@ -22,6 +22,14 @@ public class MediaLookupResponseDto
 	public string? Title { get; set; }
 
 	/// <summary>
+	/// Gets or sets the media content's image url.
+	/// </summary>
+	/// <value>
+	/// The image url.
+	/// </value>
+	public string? ImageUrl { get; set; }
+
+	/// <summary>
 	/// Gets or sets the media content's type.
 	/// </summary>
 	/// <value>
