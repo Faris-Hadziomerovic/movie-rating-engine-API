@@ -1,7 +1,4 @@
-﻿using MovieRatingEngine.API.Enums;
-using MovieRatingEngine.API.Models;
-
-namespace MovieRatingEngine.API.Envelopes.Requests;
+﻿namespace MovieRatingEngine.API.Envelopes.Requests;
 
 /// <summary>
 /// The add actor request DTO.

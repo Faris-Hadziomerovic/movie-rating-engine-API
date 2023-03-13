@@ -1,5 +1,4 @@
 ﻿using MovieRatingEngine.API.Enums;
-using MovieRatingEngine.API.Models;
 
 namespace MovieRatingEngine.API.Envelopes.Requests;
 

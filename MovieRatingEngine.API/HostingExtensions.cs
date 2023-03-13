@@ -1,7 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using FluentValidation;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
+﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -9,7 +6,6 @@ using MovieRatingEngine.API.Constants;
 using MovieRatingEngine.API.DataAccess;
 using MovieRatingEngine.API.Envelopes.Requests;
 using MovieRatingEngine.API.Extensions;
-using MovieRatingEngine.API.Helpers;
 using MovieRatingEngine.API.Helpers.EnvironmentSettings;
 using MovieRatingEngine.API.Middleware.ExceptionHandling.Extensions;
 using MovieRatingEngine.API.Services;
@@ -63,19 +59,7 @@ internal static class HostingExtensions
 
 		builder.Services.AddAuthentication();
 
-		// Adding database Context
-		builder.Services.AddDbContext<DatabaseContext>(options =>
-		{
-			var defaultConnection = builder.Configuration
-				.GetSection(nameof(ConnectionStrings))
-				.Get<ConnectionStrings>()
-				.DefaultConnection;
-
-			if (defaultConnection is not null)
-			{
-				options.UseNpgsql(defaultConnection);
-			}
-		});
+		builder.ConfigureDatabaseContext();
 
 		builder.ConfigureCustomDependencies();
 
@@ -126,9 +110,11 @@ internal static class HostingExtensions
 	private static WebApplicationBuilder ConfigureCustomDependencies(this WebApplicationBuilder builder)
 	{
 		// Register validator dependencies
-		builder.Services.AddScoped<IValidator<GetMediaLookupsRequestDto>, GetMediaLookupsRequestDtoValidator>();
-		builder.Services.AddScoped<IValidator<GetActorsRequestDto>, GetActorsRequestDtoValidator>();
-		builder.Services.AddScoped<IValidator<AddActorRequestDto>, AddActorRequestDtoValidator>();
+		builder.Services.AddTransient<IValidator<GetMediaLookupsRequestDto>, GetMediaLookupsRequestDtoValidator>();
+		builder.Services.AddTransient<IValidator<AddMediaRequestDto>, AddMediaRequestDtoValidator>();
+		builder.Services.AddTransient<IValidator<AddReviewRequestDto>, AddReviewRequestDtoValidator>();
+		builder.Services.AddTransient<IValidator<GetActorsRequestDto>, GetActorsRequestDtoValidator>();
+		builder.Services.AddTransient<IValidator<AddActorRequestDto>, AddActorRequestDtoValidator>();
 
 		// Register other dependencies that need resolving
 		builder.Services.AddTransient<IMediaService, MediaService>();
@@ -192,9 +178,8 @@ internal static class HostingExtensions
 
 		try
 		{
-			var databaseContext = services.GetRequiredService<DatabaseContext>();
-
 			// TODO: Add code to seed the database with default data.
+			var databaseContext = services.GetRequiredService<DatabaseContext>();
 
 			logger.LogInformation("Finished Seeding Default Data");
 			logger.LogInformation("Application Starting");

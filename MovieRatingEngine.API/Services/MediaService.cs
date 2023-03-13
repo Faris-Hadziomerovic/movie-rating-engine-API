@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MovieRatingEngine.API.Constants;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using MovieRatingEngine.API.DataAccess;
 using MovieRatingEngine.API.Enums;
 using MovieRatingEngine.API.Envelopes.Requests;
@@ -17,20 +17,33 @@ namespace MovieRatingEngine.API.Services;
 public class MediaService : IMediaService
 {
 	private readonly DatabaseContext _databaseContext;
+	private readonly IValidator<GetMediaLookupsRequestDto> _getMediaLookupsRequestDtoValidator;
+	private readonly IValidator<AddMediaRequestDto> _addMediaRequestDtoValidator;
+	private readonly IValidator<AddReviewRequestDto> _addReviewRequestDtoValidator;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="MediaService"/> class.
 	/// </summary>
 	/// <param name="databaseContext">The database context.</param>
-	public MediaService(DatabaseContext databaseContext)
+	/// /// <param name="getValidator">Validation service for get media lookups requests.</param>
+	/// <param name="addMediaValidator">Validation service for add media item requests.</param>
+	/// <param name="addReviewValidator">Validation service for add review requests.</param>
+	public MediaService(
+	    DatabaseContext databaseContext,
+	    IValidator<GetMediaLookupsRequestDto> getValidator,
+	    IValidator<AddMediaRequestDto> addMediaValidator,
+	    IValidator<AddReviewRequestDto> addReviewValidator)
 	{
 		_databaseContext = databaseContext;
+
+		_getMediaLookupsRequestDtoValidator = getValidator;
+		_addMediaRequestDtoValidator = addMediaValidator;
+		_addReviewRequestDtoValidator = addReviewValidator;
 	}
 
 	/// <inheritdoc/>
 	public async Task<MediaDetailsResponseDto> GetMediaDetailsByIdAsync(Guid id)
 	{
-		// TODO return cast
 		var result = await _databaseContext.MediaItems
 			.Where(m => m.Id == id)
 			.Select(m => new MediaDetailsResponseDto
@@ -42,6 +55,11 @@ public class MediaService : IMediaService
 				MediaType = m.MediaType == MediaType.Movie ? "Movie" : "TV Show",
 				ReleaseDate = m.ReleaseDate,
 				AverageRating = m.Reviews!.Count > 0 ? m.Reviews.Average(r => r.Rating) : 0,
+				Cast = m.Cast!.Select(x => new ActorResponseDto
+				{
+					Id = x.Id,
+					Name = $"{x.FirstName} {x.LastName}",
+				}).ToList(),
 			})
 			.FirstOrDefaultAsync();
 
@@ -54,51 +72,29 @@ public class MediaService : IMediaService
 	}
 
 	/// <inheritdoc/>
-	public async Task<IEnumerable<MediaLookupResponseDto>> GetMediaLookupsAsync(string? search, bool? searchShows, int size, int page)
+	public async Task<IEnumerable<MediaLookupResponseDto>> GetMediaLookupsAsync(GetMediaLookupsRequestDto getMediaLookupsRequest)
 	{
-		// TODO return cast
-		// TODO implement size and take
-		// TODO implement search
-		var result = await _databaseContext.MediaItems
-			.Select(m => new MediaLookupResponseDto
-			{
-				Id = m.Id,
-				Title = m.Title,
-				MediaType = m.MediaType == MediaType.Movie ? "Movie" : "TV Show",
-				ReleaseDate = m.ReleaseDate,
-				AverageRating = m.Reviews!.Count > 0 ? m.Reviews.Average(r => r.Rating) : 0,
-			})
-			.OrderByDescending(m => m.AverageRating)
-			.ToListAsync();
+		await _getMediaLookupsRequestDtoValidator.ValidateAndThrowAsync(getMediaLookupsRequest);
 
-		return result;
-	}
+		var skip = (getMediaLookupsRequest.Page - 1) * getMediaLookupsRequest.Size;
 
-	/// <inheritdoc/>
-	public async Task<IEnumerable<MediaLookupResponseDto>> GetMediaLookupsByDTOAsync(GetMediaLookupsRequestDto getMediaLookupsRequest)
-	{
-		var size = getMediaLookupsRequest.Size;
-		var page = getMediaLookupsRequest.Page;
+		var query = _databaseContext.MediaItems.AsQueryable();
 
 		if (string.IsNullOrWhiteSpace(getMediaLookupsRequest.Search))
 		{
-			Console.WriteLine($"Search: {getMediaLookupsRequest.Search}");
+			MediaType requestedMediaType =
+				getMediaLookupsRequest.SearchShows ?? false ? MediaType.TvShow : MediaType.Movie;
+
+			query = query.Where(m => m.MediaType == requestedMediaType);
 		}
 		else
 		{
-			Console.WriteLine($"Filter: {(getMediaLookupsRequest.SearchShows ?? false ? MediaType.TvShow : MediaType.Movie)}");
-			Console.WriteLine($"MediaContentType: {getMediaLookupsRequest.MediaContentType}");
+			query = query.Where(m => m.Title!.ToLower().Contains(getMediaLookupsRequest.Search!.ToLower()) ||
+			                         m.Description!.ToLower().Contains(getMediaLookupsRequest.Search!.ToLower()));
 		}
 
-		Console.WriteLine($"Size: {getMediaLookupsRequest.Size}");
-		Console.WriteLine($"Page: {getMediaLookupsRequest.Page}");
-		Console.WriteLine($"From: {((page - 1) * size) + 1}");
-		Console.WriteLine($"To: {page * size}");
-
-		// TODO return cast
-		// TODO implement size and take
-		// TODO implement search
-		var result = await _databaseContext.MediaItems
+		// TODO return cast ???
+		var result = await query
 			.Select(m => new MediaLookupResponseDto
 			{
 				Id = m.Id,
@@ -107,6 +103,8 @@ public class MediaService : IMediaService
 				ReleaseDate = m.ReleaseDate,
 				AverageRating = m.Reviews!.Count > 0 ? m.Reviews.Average(r => r.Rating) : 0,
 			})
+			.Skip(skip)
+			.Take(getMediaLookupsRequest.Size)
 			.OrderByDescending(m => m.AverageRating)
 			.ToListAsync();
 
@@ -116,11 +114,13 @@ public class MediaService : IMediaService
 	/// <inheritdoc/>
 	public async Task<MediaDetailsResponseDto?> AddMediaAsync(AddMediaRequestDto addMediaRequestDto)
 	{
+		await _addMediaRequestDtoValidator.ValidateAndThrowAsync(addMediaRequestDto);
+
 		var actorsToAdd = await _databaseContext.Actors
 			.Where(a => addMediaRequestDto.Cast!.Contains(a.Id))
 			.ToListAsync();
 
-		if (actorsToAdd.Count < ValidatorConstants.MinNumberOfCastMembers)
+		if (actorsToAdd.Count != addMediaRequestDto.Cast!.Count)
 		{
 			throw new ArgumentException("One or more actor Ids are invalid");
 		}
@@ -168,6 +168,8 @@ public class MediaService : IMediaService
 	/// <inheritdoc/>
 	public async Task<ReviewResponseDto> PostReviewByIdAsync(AddReviewRequestDto addReviewRequestDto)
 	{
+		await _addReviewRequestDtoValidator.ValidateAndThrowAsync(addReviewRequestDto);
+
 		var mediaItem = await _databaseContext.MediaItems.FirstOrDefaultAsync(m => m.Id == addReviewRequestDto.MediaId);
 
 		if (mediaItem is null)

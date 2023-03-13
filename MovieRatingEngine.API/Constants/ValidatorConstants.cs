@@ -54,4 +54,24 @@ public static class ValidatorConstants
 	/// Minimum description length.
 	/// </summary>
 	public const int MinDescriptionLenght = 10;
+
+	/// <summary>
+	/// Maximum review comment length.
+	/// </summary>
+	public const int MaxCommentLenght = 150;
+
+	/// <summary>
+	/// Minimum review comment length.
+	/// </summary>
+	public const int MinCommentLenght = 10;
+
+	/// <summary>
+	/// Maximum review score.
+	/// </summary>
+	public const int MaxRatingScore = 5;
+
+	/// <summary>
+	/// Minimum review score.
+	/// </summary>
+	public const int MinRatingScore = 1;
 }

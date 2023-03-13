@@ -9,7 +9,6 @@ public class GetActorsRequestDto
 {
 	/// <summary>
 	/// Gets or sets search request for actors query.
-	/// If it's ommited then the return will depend on the <seealso cref="SearchShows"/> parameter.
 	/// </summary>
 	/// <value>
 	/// The search query.

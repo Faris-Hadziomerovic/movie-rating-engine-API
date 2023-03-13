@@ -1,6 +1,4 @@
-﻿using MovieRatingEngine.API.Enums;
-
-namespace MovieRatingEngine.API.Envelopes.Responses;
+﻿namespace MovieRatingEngine.API.Envelopes.Responses;
 
 /// <summary>
 /// The media lookup response DTO.

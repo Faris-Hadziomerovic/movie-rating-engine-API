@@ -1,6 +1,4 @@
-﻿using MovieRatingEngine.API.Models;
-
-namespace MovieRatingEngine.API.Envelopes.Responses;
+﻿namespace MovieRatingEngine.API.Envelopes.Responses;
 
 /// <summary>
 /// The review response DTO.

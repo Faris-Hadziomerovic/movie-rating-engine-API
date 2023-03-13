@@ -58,7 +58,7 @@ public class ActorService : IActorService
 	/// <inheritdoc/>
 	public async Task<IEnumerable<ActorResponseDto>> GetActorsAsync(GetActorsRequestDto getActorsRequestDto)
 	{
-		_getActorsRequestDtoValidator.ValidateAndThrow(getActorsRequestDto);
+		await _getActorsRequestDtoValidator.ValidateAndThrowAsync(getActorsRequestDto);
 
 		var skip = (getActorsRequestDto.Page - 1) * getActorsRequestDto.Size;
 
@@ -85,7 +85,7 @@ public class ActorService : IActorService
 	/// <inheritdoc/>
 	public async Task<ActorResponseDto?> AddActorAsync(AddActorRequestDto addActorRequestDto)
 	{
-		_addActorRequestDtoValidator.ValidateAndThrow(addActorRequestDto);
+		await _addActorRequestDtoValidator.ValidateAndThrowAsync(addActorRequestDto);
 
 		var actorExists = await _databaseContext.Actors.AnyAsync(a =>
 			a.FirstName!.ToLower() == addActorRequestDto.FirstName!.ToLower() &&
@@ -96,7 +96,7 @@ public class ActorService : IActorService
 			throw new ActorAlreadyExistsException();
 		}
 
-		var actor = new Actor()
+		var actor = new Actor
 		{
 			Id = Guid.NewGuid(),
 			FirstName = addActorRequestDto.FirstName,

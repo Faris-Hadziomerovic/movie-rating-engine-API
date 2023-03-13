@@ -2,7 +2,6 @@
 using MovieRatingEngine.API.Constants;
 using MovieRatingEngine.API.Envelopes.Requests;
 using MovieRatingEngine.API.Envelopes.Responses;
-using MovieRatingEngine.API.Helpers.Exceptions;
 using MovieRatingEngine.API.Helpers.Exceptions.Generic;
 using MovieRatingEngine.API.Services.Interfaces;
 
@@ -27,43 +26,16 @@ public class MediaController : Controller
 	}
 
 	/// <summary>
-	/// Gets requested media lookup info.
-	/// </summary>
-	/// <param name="search">
-	/// Search request for media lookup information.
-	/// If it's ommited then the return will depend on the <seealso href="searchShows"/> parameter.
-	/// </param>
-	/// <param name="searchShows">
-	/// Flag that represents if a tv show list should be returned, if it's false or ommited then a movie list will be returned by default.
-	/// The <see href="search"/> query overrides this parameter, thus it will only be taken into account if the search parameter is empty or null.
-	/// </param>
-	/// <param name="size"> Maximum size of the response list. Defaults to <see cref="DefaultConstants.MediaLookupResponseListLength"/>. </param>
-	/// <param name="page">
-	/// Defines how many elements in the query should be skipped multiplied by <see href="size"/>. Used for pagination.
-	/// Defaults to <see cref="DefaultConstants.MediaLookupResponsePageNumber"/>.
-	/// </param>
-	/// <returns> HTTP response with a list of media lookup information. </returns>
-	[HttpGet]
-	public async Task<ActionResult<IEnumerable<MediaLookupResponseDto>>> GetMediaLookupListAsync(
-		[FromQuery] string? search,
-		[FromQuery] bool searchShows = false,
-		[FromQuery] int size = DefaultConstants.MediaLookupResponseListLength,
-		[FromQuery] int page = DefaultConstants.MediaLookupResponsePageNumber)
-	{
-		return Ok(await _mediaService.GetMediaLookupsAsync(search, searchShows, size, page));
-	}
-
-	/// <summary>
 	/// Retrieves a list of media lookups based on the provided request DTO.
 	/// </summary>
 	/// <param name="getMediaLookupsRequestDto">The request DTO containing search parameters.
 	/// See <see cref="GetMediaLookupsRequestDto"/> for more information. </param>
 	/// <returns> HTTP response with a list of media lookup response DTOs. </returns>
-	[HttpGet("dto")]
+	[HttpGet]
 	public async Task<ActionResult<IEnumerable<MediaLookupResponseDto>>> GetMediaLookupListByRequestDtoAsync(
 		[FromQuery] GetMediaLookupsRequestDto getMediaLookupsRequestDto)
 	{
-		return Ok(await _mediaService.GetMediaLookupsByDTOAsync(getMediaLookupsRequestDto));
+		return Ok(await _mediaService.GetMediaLookupsAsync(getMediaLookupsRequestDto));
 	}
 
 	/// <summary>
@@ -71,7 +43,7 @@ public class MediaController : Controller
 	/// </summary>
 	/// <param name="id">The requested media's id.</param>
 	/// <returns> HTTP response with the requested <see cref="MediaDetailsResponseDto"/>.</returns>
-	[HttpGet("{id}")]
+	[HttpGet("{id:guid}")]
 	public async Task<ActionResult<MediaDetailsResponseDto>> GetMediaDetailsByIdAsync([FromRoute] Guid id)
 	{
 		try

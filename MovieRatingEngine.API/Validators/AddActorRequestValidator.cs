@@ -14,6 +14,7 @@ public class AddActorRequestDtoValidator : AbstractValidator<AddActorRequestDto>
 	public AddActorRequestDtoValidator()
 	{
 		RuleFor(x => x.FirstName).NotEmpty();
+
 		RuleFor(x => x.LastName).NotEmpty();
 	}
 }

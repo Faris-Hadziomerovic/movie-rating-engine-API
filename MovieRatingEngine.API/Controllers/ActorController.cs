@@ -3,7 +3,6 @@ using MovieRatingEngine.API.Constants;
 using MovieRatingEngine.API.Envelopes.Requests;
 using MovieRatingEngine.API.Envelopes.Responses;
 using MovieRatingEngine.API.Helpers.Exceptions.Generic;
-using MovieRatingEngine.API.Services;
 using MovieRatingEngine.API.Services.Interfaces;
 
 namespace MovieRatingEngine.API.Controllers;
