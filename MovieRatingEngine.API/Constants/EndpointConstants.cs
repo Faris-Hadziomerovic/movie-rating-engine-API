@@ -8,5 +8,5 @@ public static class EndpointConstants
 	/// <summary>
 	/// Represents version 1 of the API.
 	/// </summary>
-	public const string Version1 = "v1/api/[controller]";
+	public const string Version1 = "api/v1/[controller]";
 }

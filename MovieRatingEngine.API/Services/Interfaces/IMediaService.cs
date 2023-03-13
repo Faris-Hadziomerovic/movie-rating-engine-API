@@ -16,6 +16,12 @@ public interface IMediaService
 	Task<IEnumerable<MediaLookupResponseDto>> GetMediaLookupsAsync(GetMediaLookupsRequestDto getMediaLookupsRequest);
 
 	/// <summary>
+	/// Gets the total number of media items.
+	/// </summary>
+	/// <returns>The total number of media items.</returns>
+	Task<int> GetMediaCountAsync();
+
+	/// <summary>
 	/// Gets a specific media item's full details. Throws if not found.
 	/// </summary>
 	/// <param name="id">The requested media's id.</param>

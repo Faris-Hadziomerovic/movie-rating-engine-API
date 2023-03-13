@@ -32,10 +32,20 @@ public class MediaController : Controller
 	/// See <see cref="GetMediaLookupsRequestDto"/> for more information. </param>
 	/// <returns> HTTP response with a list of media lookup response DTOs. </returns>
 	[HttpGet]
-	public async Task<ActionResult<IEnumerable<MediaLookupResponseDto>>> GetMediaLookupListByRequestDtoAsync(
+	public async Task<ActionResult<IEnumerable<MediaLookupResponseDto>>> GetMediaLookupListAsync(
 		[FromQuery] GetMediaLookupsRequestDto getMediaLookupsRequestDto)
 	{
 		return Ok(await _mediaService.GetMediaLookupsAsync(getMediaLookupsRequestDto));
+	}
+
+	/// <summary>
+	/// Retrieves a the total number of media items.
+	/// </summary>
+	/// <returns> HTTP response with the total number of media items. </returns>
+	[HttpGet("count")]
+	public async Task<ActionResult<int>> GetMediaItemCountAsync()
+	{
+		return Ok(await _mediaService.GetMediaCountAsync());
 	}
 
 	/// <summary>

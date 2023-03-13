@@ -10,7 +10,7 @@ public class GetMediaLookupsRequestDto
 {
 	/// <summary>
 	/// Gets or sets search request for media lookup information.
-	/// If it's ommited then the return will depend on the <seealso cref="SearchShows"/> parameter.
+	/// If it's omitted then the return will depend on the <seealso cref="SearchShows"/> parameter.
 	/// </summary>
 	/// <value>
 	/// The search query.
@@ -18,7 +18,7 @@ public class GetMediaLookupsRequestDto
 	public string? Search { get; set; }
 
 	/// <summary>
-	/// Gets or sets the flag that represents if a tv show list should be returned, if it's false or ommited then a movie list will be returned by default.
+	/// Gets or sets the flag that represents if a tv show list should be returned, if it's false or omitted then a movie list will be returned by default.
 	/// The <see cref="Search"/> query overrides this parameter, thus it will only be taken into account if the search parameter is empty or null.
 	/// </summary>
 	/// <value>
@@ -32,7 +32,7 @@ public class GetMediaLookupsRequestDto
 	/// Defaults to <see cref="MediaType.Movie"/>.
 	/// </summary>
 	/// <value>
-	/// Media type to be retured.
+	/// Media type to be returned.
 	/// </value>
 	public MediaType? MediaContentType { get; set; } = MediaType.Movie;
 

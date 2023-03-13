@@ -46,7 +46,7 @@ internal static class HostingExtensions
 				corsPolicyBuilder =>
 				{
 					var allowedOrigins = builder.Configuration.GetSection(nameof(CorsSettings))
-						.Get<CorsSettings>().AllowedOrigins;
+						.Get<CorsSettings>().AllowedOrigins;;
 
 					corsPolicyBuilder.WithOrigins(allowedOrigins)
 						.AllowAnyHeader()

@@ -112,6 +112,12 @@ public class MediaService : IMediaService
 	}
 
 	/// <inheritdoc/>
+	public async Task<int> GetMediaCountAsync()
+	{
+		return await _databaseContext.MediaItems.CountAsync();
+	}
+
+	/// <inheritdoc/>
 	public async Task<MediaDetailsResponseDto?> AddMediaAsync(AddMediaRequestDto addMediaRequestDto)
 	{
 		await _addMediaRequestDtoValidator.ValidateAndThrowAsync(addMediaRequestDto);
